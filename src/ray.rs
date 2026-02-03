@@ -12,11 +12,11 @@ impl Ray {
         }
     }
 
-    pub fn origin(&self) -> &Vec3 {
-        &self.orig
+    pub fn origin(&self) -> Vec3 {
+        self.orig // copy rather than immutable ref
     }
-    pub fn direction(&self) -> &Vec3 {
-        &self.dir
+    pub fn direction(&self) -> Vec3 {
+        self.dir // copy rather than immutable ref
     }
 
     pub fn at(&self, t: f64) -> Vec3 {
