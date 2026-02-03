@@ -107,15 +107,15 @@ impl ops::Div<f64> for Vec3 {
     }
 }
 
-// pub enum Vec3Enum {
-//     Point3(Vec3),
-//     Color(Vec3)
-// }
+pub enum Vec3Enum {
+    Point3(Vec3),
+    Color(Vec3)
+}
 
 pub mod color {
-    use super::Vec3 as color;
+    use super::Vec3 as Color;
 
-    pub fn write_color(pixel_color: &color) {
+    pub fn write_color(pixel_color: &Color) {
         let r = pixel_color.x();
         let g = pixel_color.y();
         let b = pixel_color.z();
