@@ -1,24 +1,21 @@
-use std::rc::Rc;
-
-use crate::Vec3;
 use crate::hittable::*;
 
-struct HittableList {
+pub struct HittableList {
     pub objects: Vec<Box<dyn Hittable>>,
 }
 
 impl HittableList {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             objects: Vec::new(),
         }
     }
 
-    fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.objects.clear();
     }
 
-    fn add(&mut self, object: Box<dyn Hittable>) {
+    pub fn add(&mut self, object: Box<dyn Hittable>) {
         self.objects.push(object);
     }
 }

@@ -1,33 +1,38 @@
 mod vec3;
+
 use vec3::{Vec3, Vec3Enum, color};
+
 mod ray;
 use ray::Ray;
+
 mod hittable;
+use hittable::*;
 mod hittable_list;
+use hittable_list::*;
+
 mod rtweekend;
 mod shapes;
+use rtweekend::*;
 
-fn hit_sphere(center: &Vec3, radius: f64, r: &Ray) -> Option<f64> {
-    let oc: Vec3 = *center - *r.origin();
-    let a = r.direction().length_squared();
-    let h = Vec3::dot(r.direction(), &oc);
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = h * h - a * c;
+use crate::shapes::Sphere;
 
-    if discriminant < 0.0 {
-        None
-    } else {
-        Some((h - discriminant.sqrt()) / a)
+fn ray_color(r: &Ray, world: &impl Hittable) -> Vec3 {
+    // let center = Vec3(0.0, 0.0, -1.0);
+    // let radius = 0.5;
+    // if let Option::Some(t) = hit_sphere(&center, radius, r) {
+    //     let N = Vec3::unit_vector(&(r.at(t) - center));
+    //     return Vec3(N.x() + 1.0, N.y() + 1.0, N.z() + 1.0) / 2.0;
+    // }
+    let mut rec = HitRecord {
+        p: Vec3(0.0, 0.0, 0.0),
+        normal: Vec3(0.0, 0.0, 0.0),
+        t: 0.0,
+        front_face: false,
+    };
+    if world.hit(r, 0.0, INFINITY, &mut rec) {
+        return 0.5 * (rec.normal + Vec3(1.0, 1.0, 1.0)); // White color
     }
-}
 
-fn ray_color(r: &Ray) -> Vec3 {
-    let center = Vec3(0.0, 0.0, -1.0);
-    let radius = 0.5;
-    if let Option::Some(t) = hit_sphere(&center, radius, r) {
-        let N = Vec3::unit_vector(&(r.at(t) - center));
-        return Vec3(N.x() + 1.0, N.y() + 1.0, N.z() + 1.0) / 2.0;
-    }
     let unit_direction = Vec3::unit_vector(r.direction());
     let a = 0.5 * (unit_direction.y() + 1.0);
     // linear blend/interpolation (lerp) between white and light blue
@@ -41,6 +46,11 @@ fn main() {
     let image_width: u16 = 400;
     let image_height: u16 = (image_width as f64 / aspect_ratio) as u16;
     let image_height = if image_height < 1 { 1 } else { image_height };
+
+    // World
+    let mut world = HittableList::new();
+    world.add(Box::new(Sphere::new(&Vec3(0.0, 0.0, -1.0), 0.5 as f64)));
+    world.add(Box::new(Sphere::new(&Vec3(0.0, -100.5, -1.0), 100.0)));
 
     // Camera
 
@@ -74,7 +84,7 @@ fn main() {
             let ray_direction = pixel_center - camera_center;
             let r = Ray::new(&camera_center, &ray_direction);
 
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
             color::write_color(&pixel_color);
         }
     }
