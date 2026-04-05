@@ -1,5 +1,7 @@
 use crate::hittable::*;
-use crate::vec3::Vec3;
+use crate::interval::*;
+use crate::ray::*;
+use crate::vec3::*;
 
 pub struct Sphere {
     center: Vec3,
@@ -16,7 +18,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &crate::ray::Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let oc: Vec3 = self.center - *r.origin();
         let a = r.direction().length_squared();
         let h = Vec3::dot(r.direction(), &oc);
@@ -32,9 +34,9 @@ impl Hittable for Sphere {
         // Find the nearest root that lies in the acceptable range. note pos. t values from camera
         let mut root = (h - sqrtd) / a; // Check the closer root
         // after this we are checking the ray hitting the "inside" of the sphere?
-        if root <= ray_tmin || ray_tmax <= root {
+        if !ray_t.surrounds(root) {
             root = (h + sqrtd) / a; // Check the farther root
-            if root <= ray_tmin || ray_tmax <= root {
+            if !ray_t.surrounds(root) {
                 return false;
             }
         }
