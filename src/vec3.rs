@@ -1,26 +1,74 @@
 use std::ops;
+
+use crate::rtweekend::{random_double, random_double_range};
+
 #[derive(PartialEq, Copy, Clone, Debug)]
 pub struct Vec3(pub f64, pub f64, pub f64);
 
 impl Vec3 {
-    pub fn x(&self) -> f64 {self.0}
-    pub fn y(&self) -> f64 {self.1}
-    pub fn z(&self) -> f64 {self.2}
-    pub fn length(&self) -> f64 {self.length_squared().sqrt()}
-    pub fn length_squared(&self) -> f64 {self.0 * self.0 + self.1 * self.1 + self.2 * self.2}
+    pub fn x(&self) -> f64 {
+        self.0
+    }
+    pub fn y(&self) -> f64 {
+        self.1
+    }
+    pub fn z(&self) -> f64 {
+        self.2
+    }
+    pub fn length(&self) -> f64 {
+        self.length_squared().sqrt()
+    }
+    pub fn length_squared(&self) -> f64 {
+        self.0 * self.0 + self.1 * self.1 + self.2 * self.2
+    }
+
+    pub fn random() -> Self {
+        Self(random_double(), random_double(), random_double())
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Self {
+        Vec3(
+            random_double_range(min, max),
+            random_double_range(min, max),
+            random_double_range(min, max),
+        )
+    }
 
     pub fn dot(u: &Self, v: &Self) -> f64 {
         u.0 * v.0 + u.1 * v.1 + u.2 * v.2
     }
 
     pub fn cross(u: &Self, v: &Self) -> Self {
-        Self(u.1 * v.2 - u.2 * v.1,
-             u.2 * v.0 - u.0 * v.2,
-             u.0 * v.1 - u.1 * v.0)
+        Self(
+            u.1 * v.2 - u.2 * v.1,
+            u.2 * v.0 - u.0 * v.2,
+            u.0 * v.1 - u.1 * v.0,
+        )
     }
 
     pub fn unit_vector(v: &Self) -> Self {
         *v / v.length()
+    }
+
+    pub fn random_unit_vector() -> Self {
+        loop {
+            let p = Self::random_range(-1.0, 1.0);
+            let len_sq = p.length_squared();
+            // avoiding vectors really close to the center, as by normalizing we'll get Vec(+-inf, +-inf, +-inf)
+            // and vectors outside the sphere
+            if 1e-160 < len_sq && len_sq <= 1.0 {
+                return p / len_sq.sqrt(); // normalize vector
+            }
+        }
+    }
+
+    pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
+        let on_unit_sphere = Self::random_unit_vector();
+        if Self::dot(&on_unit_sphere, normal) > 0.0 {
+            return on_unit_sphere;
+        } else {
+            return -on_unit_sphere;
+        }
     }
 }
 
@@ -34,9 +82,7 @@ impl ops::Neg for Vec3 {
 
 impl ops::AddAssign for Vec3 {
     fn add_assign(&mut self, other: Self) {
-        *self = Self(self.0 + other.0,
-                     self.1 + other.1,
-                     self.2 + other.2);
+        *self = Self(self.0 + other.0, self.1 + other.1, self.2 + other.2);
     }
 }
 
@@ -50,7 +96,7 @@ impl ops::MulAssign<f64> for Vec3 {
 
 impl ops::DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, t: f64) {
-        *self *= 1.0/t;
+        *self *= 1.0 / t;
     }
 }
 
@@ -103,16 +149,18 @@ impl ops::Div<f64> for Vec3 {
     type Output = Self;
 
     fn div(self, t: f64) -> Self {
-        (1.0/t) * self
+        (1.0 / t) * self
     }
 }
 
 pub enum Vec3Enum {
     Point3(Vec3),
-    Color(Vec3)
+    Color(Vec3),
 }
 
 pub mod color {
+    use crate::interval::*;
+
     use super::Vec3 as Color;
 
     pub fn write_color(pixel_color: &Color) {
@@ -120,9 +168,11 @@ pub mod color {
         let g = pixel_color.y();
         let b = pixel_color.z();
 
-        let rbyte: u16 = (255.0 * r) as u16;
-        let gbyte: u16 = (255.0 * g) as u16;
-        let bbyte: u16 = (255.0 * b) as u16;
+        // Translate the <0, 1> component values values to the byte range <0, 255>
+        let intensity = Interval::new(0.000, 0.999); // ensure values are in the correct range
+        let rbyte = (256.0 * intensity.clamp(r)) as i32;
+        let gbyte = (256.0 * intensity.clamp(g)) as i32;
+        let bbyte = (256.0 * intensity.clamp(b)) as i32;
 
         println!("{rbyte} {gbyte} {bbyte}");
     }
