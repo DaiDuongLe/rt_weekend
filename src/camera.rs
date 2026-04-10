@@ -123,7 +123,7 @@ impl Camera {
             front_face: false,
         };
         if world.hit(r, Interval::new(0.001, INFINITY), &mut rec) {
-            let direction = Vec3::random_on_hemisphere(&rec.normal);
+            let direction = rec.normal + Vec3::random_unit_vector();
             return 0.5 * Self::ray_color(&Ray::new(&rec.p, &direction), depth - 1, world); // 50% => gray color
         }
 
