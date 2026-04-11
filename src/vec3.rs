@@ -163,10 +163,22 @@ pub mod color {
 
     use super::Vec3 as Color;
 
+    fn linear_to_gamma(linear_component: f64) -> f64 {
+        if linear_component > 0.0 {
+            return linear_component.sqrt();
+        }
+        0.0
+    }
+
     pub fn write_color(pixel_color: &Color) {
         let r = pixel_color.x();
         let g = pixel_color.y();
         let b = pixel_color.z();
+
+        // Apply a linear to gamma transform for gamma 2
+        let r = linear_to_gamma(r);
+        let g = linear_to_gamma(g);
+        let b = linear_to_gamma(b);
 
         // Translate the <0, 1> component values values to the byte range <0, 255>
         let intensity = Interval::new(0.000, 0.999); // ensure values are in the correct range
