@@ -1,31 +1,56 @@
 mod vec3;
-use vec3::{Vec3, color};
+use vec3::*;
 
 mod ray;
-use ray::Ray;
 
 mod hittable;
-use hittable::*;
 mod hittable_list;
 use hittable_list::*;
 
 mod rtweekend;
-use rtweekend::*;
 
 mod shapes;
 use crate::shapes::Sphere;
 
 mod interval;
-use interval::*;
 
 mod camera;
 use camera::*;
 
+mod material;
+use material::*;
+
+use std::rc::Rc;
+
 fn main() {
     // World
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(&Vec3(0.0, 0.0, -1.0), 0.5 as f64)));
-    world.add(Box::new(Sphere::new(&Vec3(0.0, -100.5, -1.0), 100.0)));
+
+    let material_ground = Rc::new(Lambertian::new(&Vec3(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(Lambertian::new(&Vec3(0.1, 0.2, 0.5)));
+    let material_left = Rc::new(Metal::new(&Vec3(0.8, 0.8, 0.8)));
+    let material_right = Rc::new(Metal::new(&Vec3(0.8, 0.6, 0.2)));
+
+    world.add(Box::new(Sphere::new(
+        &Vec3(0.0, -100.5, -1.0),
+        100.0,
+        material_ground.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        &Vec3(0.0, 0.0, -1.0),
+        0.5,
+        material_center.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        &Vec3(-1.0, 0.0, -1.3),
+        0.5,
+        material_left.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        &Vec3(1.0, 0.0, -1.3),
+        0.5,
+        material_right.clone(),
+    )));
 
     // Camera
     let mut cam = Camera::new();

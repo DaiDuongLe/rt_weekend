@@ -1,6 +1,9 @@
+use std::rc::Rc;
+
 use crate::hittable::*;
 // use crate::hittable_list::*;
 use crate::interval::*;
+use crate::material::*;
 use crate::ray::*;
 use crate::rtweekend::*;
 use crate::vec3::*;
@@ -121,10 +124,16 @@ impl Camera {
             normal: Vec3(0.0, 0.0, 0.0),
             t: 0.0,
             front_face: false,
+            mat: Rc::new(Lambertian::new(&Vec3(0.0, 0.0, 0.0))),
         };
+
         if world.hit(r, Interval::new(0.001, INFINITY), &mut rec) {
-            let direction = rec.normal + Vec3::random_unit_vector();
-            return 0.5 * Self::ray_color(&Ray::new(&rec.p, &direction), depth - 1, world); // 50% => gray color
+            let mut scattered = Ray::new(&Vec3(0.0, 0.0, 0.0), &Vec3(0.0, 0.0, 0.0));
+            let mut attenuation = Vec3(0.0, 0.0, 0.0);
+            if rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
+                return attenuation * Self::ray_color(&scattered, depth - 1, world);
+            }
+            return Vec3(0.0, 0.0, 0.0);
         }
 
         let unit_direction = Vec3::unit_vector(r.direction());

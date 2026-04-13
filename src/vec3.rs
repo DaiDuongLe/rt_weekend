@@ -22,6 +22,11 @@ impl Vec3 {
         self.0 * self.0 + self.1 * self.1 + self.2 * self.2
     }
 
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.0.abs() < s && self.1.abs() < s && self.2.abs() < s
+    }
+
     pub fn random() -> Self {
         Self(random_double(), random_double(), random_double())
     }
@@ -69,6 +74,10 @@ impl Vec3 {
         } else {
             return -on_unit_sphere;
         }
+    }
+
+    pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+        *v - 2.0 * Self::dot(v, n) * *n
     }
 }
 
