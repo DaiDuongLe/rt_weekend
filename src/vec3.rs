@@ -79,6 +79,12 @@ impl Vec3 {
     pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
         *v - 2.0 * Self::dot(v, n) * *n
     }
+
+    pub fn refract(uv: &Vec3, n: &Vec3, idxref_ratio: f64) -> Vec3 {
+        let r_prime_perp = idxref_ratio * (*uv + Vec3::dot(&-*uv, n).min(1.0) * *n);
+        let r_prime_paral = -f64::sqrt((1.0 - r_prime_perp.length_squared()).abs()) * *n;
+        r_prime_perp + r_prime_paral
+    }
 }
 
 impl ops::Neg for Vec3 {
