@@ -29,7 +29,7 @@ fn main() {
     let material_ground = Rc::new(Lambertian::new(&Vec3(0.8, 0.8, 0.0)));
     let material_center = Rc::new(Lambertian::new(&Vec3(0.1, 0.2, 0.5)));
     // let material_left = Rc::new(Metal::new(&Vec3(0.8, 0.8, 0.8), 0.0));
-    let material_left = Rc::new(Dielectric::new(1.50));
+    let material_left = Rc::new(Dielectric::new(1.00 / 1.33));
     let material_right = Rc::new(Metal::new(&Vec3(0.8, 0.6, 0.2), 0.0));
 
     world.add(Box::new(Sphere::new(
@@ -43,7 +43,7 @@ fn main() {
         material_center.clone(),
     )));
     world.add(Box::new(Sphere::new(
-        &Vec3(-1.0, 0.0, -1.3),
+        &Vec3(-1.0, 0.0, -0.9),
         0.5,
         material_left.clone(),
     )));

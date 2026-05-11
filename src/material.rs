@@ -81,9 +81,7 @@ pub struct Dielectric {
 
 impl Dielectric {
     pub fn new(refraction_index: f64) -> Self {
-        Self {
-            refraction_index,
-        }
+        Self { refraction_index }
     }
 }
 
@@ -96,12 +94,23 @@ impl Material for Dielectric {
         scattered: &mut Ray,
     ) -> bool {
         *attenuation = Vec3(1.0, 1.0, 1.0);
-        let ri: f64 = if rec.front_face { 1.0/self.refraction_index } else { self.refraction_index };
+        let ri: f64 = if rec.front_face {
+            1.0 / self.refraction_index
+        } else {
+            self.refraction_index
+        };
 
         let unit_direction = Vec3::unit_vector(r_in.direction());
-        let refracted = Vec3::refract(&unit_direction, &rec.normal, ri);
 
-        *scattered = Ray::new(&rec.p, &refracted);
+        let cos_theta = Vec3::dot(&-unit_direction, &rec.normal).min(1.0);
+        let sin_theta = (1.0 - cos_theta.powi(2)).sqrt();
+        let direction = if ri * sin_theta > 1.0 {
+            Vec3::reflect(&unit_direction, &rec.normal)
+        } else {
+            Vec3::refract(&unit_direction, &rec.normal, ri)
+        };
+
+        *scattered = Ray::new(&rec.p, &direction);
         true
     }
 }
