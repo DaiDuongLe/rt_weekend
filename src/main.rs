@@ -29,8 +29,9 @@ fn main() {
     let material_ground = Rc::new(Lambertian::new(&Vec3(0.8, 0.8, 0.0)));
     let material_center = Rc::new(Lambertian::new(&Vec3(0.1, 0.2, 0.5)));
     // let material_left = Rc::new(Metal::new(&Vec3(0.8, 0.8, 0.8), 0.0));
-    let material_left = Rc::new(Dielectric::new(1.00 / 1.33));
-    let material_right = Rc::new(Metal::new(&Vec3(0.8, 0.6, 0.2), 0.0));
+    let material_left = Rc::new(Dielectric::new(1.5));
+    let material_bubble = Rc::new(Dielectric::new(1.0 / 1.5));
+    let material_right = Rc::new(Metal::new(&Vec3(0.8, 0.8, 0.8), 0.0));
 
     world.add(Box::new(Sphere::new(
         &Vec3(0.0, -100.5, -1.0),
@@ -38,19 +39,34 @@ fn main() {
         material_ground.clone(),
     )));
     world.add(Box::new(Sphere::new(
-        &Vec3(0.0, 0.0, -1.0),
+        &Vec3(0.0, 0.0, -2.0),
         0.5,
-        material_center.clone(),
+        material_right.clone(),
     )));
     world.add(Box::new(Sphere::new(
-        &Vec3(-1.0, 0.0, -0.9),
+        &Vec3(-1.0, 0.0, -1.4),
         0.5,
         material_left.clone(),
     )));
     world.add(Box::new(Sphere::new(
+        &Vec3(-1.0, 0.0, -1.4),
+        0.4,
+        material_bubble.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        &Vec3(0.0, 0.0, -1.5),
+        0.3,
+        material_left.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
+        &Vec3(0.0, 0.0, -1.5),
+        0.2,
+        material_bubble.clone(),
+    )));
+    world.add(Box::new(Sphere::new(
         &Vec3(1.0, 0.0, -1.3),
         0.5,
-        material_right.clone(),
+        material_center.clone(),
     )));
 
     // Camera
