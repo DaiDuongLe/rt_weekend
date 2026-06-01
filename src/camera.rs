@@ -19,6 +19,7 @@ pub struct Camera {
     pub image_width: u32,     // Rendered image width in pixel count
     pub samples_per_pixel: u32,
     pub max_depth: u32,
+    pub vfov: f64,
 }
 
 impl Camera {
@@ -34,6 +35,7 @@ impl Camera {
             image_width: 100,
             samples_per_pixel: 10,
             max_depth: 10,
+            vfov: 90.0,
         }
     }
 
@@ -72,7 +74,9 @@ impl Camera {
 
         // Determine viewport dimensions.
         let focal_length = 1.0;
-        let viewport_height = 2.0;
+        let theta = degrees_to_radians(self.vfov);
+        let h = (theta / 2.0).tan();
+        let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (self.image_width as f64 / self.image_height as f64);
 
         // Calculate vectors across viewport edges
@@ -109,7 +113,7 @@ impl Camera {
     }
 
     fn sample_square() -> Vec3 {
-        // <-0.5, 0.5> square sample region around the pixel (unit square)
+        // < -0.5, 0.5 > square sample region around the pixel (unit square)
         Vec3(random_double() - 0.5, random_double() - 0.5, 0.0)
     }
 

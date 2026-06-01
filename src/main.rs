@@ -77,5 +77,7 @@ fn main() {
     cam.samples_per_pixel = 150;
     cam.max_depth = 50;
 
+    cam.vfov = 90.0;
+
     cam.render(&world);
 }
