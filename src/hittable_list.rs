@@ -1,3 +1,4 @@
+#![allow(unused)]
 use crate::hittable::*;
 use crate::interval::*;
 use crate::ray::*;

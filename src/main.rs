@@ -48,18 +48,18 @@ fn main() {
         0.5,
         material_left.clone(),
     )));
+    // world.add(Box::new(Sphere::new(
+    //     &Vec3(-1.0, 0.0, -1.4),
+    //     0.4,
+    //     material_bubble.clone(),
+    // )));
     world.add(Box::new(Sphere::new(
-        &Vec3(-1.0, 0.0, -1.4),
-        0.4,
-        material_bubble.clone(),
-    )));
-    world.add(Box::new(Sphere::new(
-        &Vec3(0.0, 0.0, -1.5),
+        &Vec3(0.0, 0.0, -1.0),
         0.3,
         material_left.clone(),
     )));
     world.add(Box::new(Sphere::new(
-        &Vec3(0.0, 0.0, -1.5),
+        &Vec3(0.0, 0.0, -1.0),
         0.2,
         material_bubble.clone(),
     )));
@@ -74,10 +74,13 @@ fn main() {
 
     cam.aspect_ratio = 16.0 / 9.0;
     cam.image_width = 1920;
-    cam.samples_per_pixel = 150;
+    cam.samples_per_pixel = 500;
     cam.max_depth = 50;
 
-    cam.vfov = 90.0;
+    cam.vfov = 30.0;
+    cam.lookfrom = Vec3(-2.0, 2.0, 1.0);
+    cam.lookat = Vec3(0.0, 0.0, -1.5);
+    cam.vup = Vec3(0.0, 1.0, 0.0);
 
     cam.render(&world);
 }

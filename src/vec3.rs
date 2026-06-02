@@ -168,11 +168,6 @@ impl ops::Div<f64> for Vec3 {
     }
 }
 
-pub enum Vec3Enum {
-    Point3(Vec3),
-    Color(Vec3),
-}
-
 pub mod color {
     use crate::interval::*;
 
